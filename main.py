@@ -54,7 +54,8 @@ def handle_photo(update, context):
     img = cv2.resize(img, (32,32), interpolation = cv2.INTER_AREA)
 
     prediction = model.predict(np.array([img / 255 ]))
-    update.message.reply_text(f'In this image Farzan bot sees{class_names[np.argmax(prediction)]}')
+    update.message.reply_text(f'In this image Farzan bot sees {class_names[np.argmax(prediction)]}')
+
 
 updater = Updater(TOKEN, use_context= True)
 dp = updater.dispatcher
