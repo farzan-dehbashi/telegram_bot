@@ -34,13 +34,27 @@ def help (update, context):
     ''')
 
 def train (update, context):
-    pass
+    update.message.reply_text('Model is being trained...')
+    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics= ['accuracy'])
+    model.fit(x_train, y_train, epochs= 10, validation_data=(x_test, y_test))
+    model.save('cifar_classifier.model')
+    update.message.reply_text('Training is done')
+
 
 def handle_message(update, context):
     update.message.reply_text(' please train the  model and send a pic')
 
 def handle_photo(update, context):
-    pass
+    file = context.bot.get_file(update.message.photo[-1].file_id)
+    f = BytesIO(file.download_as_bytearray())
+    file_bytes = np.asarray(bytearray(f.read()), dtype = np.uint8)
+
+    img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+    cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    img = cv2.resize(img, (32,32), interpolation = cv2.INTER_AREA)
+
+    prediction = model.predict(np.array([img / 255 ]))
+    update.message.reply_text(f'In this image Farzan bot sees{class_names[np.argmax(prediction)]}')
 
 updater = Updater(TOKEN, use_context= True)
 dp = updater.dispatcher
